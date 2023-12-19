@@ -7,10 +7,10 @@
 
 using namespace std;
 
-bool gameOver = false;
+bool isGameOver = false;
 
 const int blocksCount = 7;
-const char blocksSprites[blocksCount] {'0', '1', '2', '3', '4', '5', '6'};
+const int blocksSprites[blocksCount] {'0', '1', '2', '3', '4', '5', '6'};
 
 const char wallSprite = '#';
 
@@ -166,19 +166,21 @@ void doMoveBlockRight() {
 
 void clearMap() {
   for (int examRowIndex = 0; examRowIndex < map.size() - 1; ++examRowIndex) {
-    int rowLength = map[examRowIndex].size();
-
+    int rowLength = map[examRowIndex].size() - 2;
+    int blocksSum = 0;
     for (int columnIndex = 0; columnIndex < map[examRowIndex].size(); ++columnIndex) {
-      if (map[examRowIndex][columnIndex] != ' ') {
+      if (map[examRowIndex][columnIndex] != ' ' && map[examRowIndex][columnIndex] != '*') {
         --rowLength;
+        blocksSum += map[examRowIndex][columnIndex] - '0';
       }
     }
 
     if (rowLength == 0) {
-      ++score;
+      score += blocksSum;
       for (int toClerrRowIndex = examRowIndex; toClerrRowIndex > 0; --toClerrRowIndex) {
         map[toClerrRowIndex] = map[toClerrRowIndex - 1];
       }
+
     }
 
   }
@@ -208,7 +210,7 @@ void logic() {
     realBlock = a;
     
     if ( !canFall() ) {
-      gameOver = true;
+      isGameOver = true;
     }
   }
 
@@ -242,6 +244,8 @@ void drawMap() {
     cout << endl;
 
   }
+
+  cout << "score: " << score;
 };
 
 void tryRotate() {
@@ -300,11 +304,12 @@ void controls() {
 
 int main() {
   int timer = time(NULL);
-
-  while(!gameOver) {
+  int tick = 1;
+  
+  while(!isGameOver) {
     controls();
 
-    if (time(NULL) - timer > 0) {
+    if (time(NULL) - timer >= tick) {
       logic();
       drawMap();
 
@@ -313,7 +318,7 @@ int main() {
 
   }
   
-  cout << "score: " << score << endl;
+  //cout << "score: " << score << endl;
   system("pause");
 
   return 0;
